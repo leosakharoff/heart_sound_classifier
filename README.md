@@ -1,6 +1,10 @@
 # Heart Sound Classifier
 
 A deep learning prototype for classifying heart sounds as **Normal** or **Abnormal** using mel spectrograms and convolutional neural networks (CNNs).
+<img width="2100" height="1200" alt="example_sounds" src="https://github.com/user-attachments/assets/3f03c81e-92e7-4c28-aaf1-8dac979d49e2" />
+<img width="1800" height="600" alt="training_curves" src="https://github.com/user-attachments/assets/f29320e0-981e-4e77-93f5-b30cfa370909" />
+<img width="2063" height="1185" alt="preprocessing_diagram" src="https://github.com/user-attachments/assets/3cb591ec-bb3b-429c-adbe-6ba4387a5f36" />
+<img width="2085" height="1335" alt="model_architecture" src="https://github.com/user-attachments/assets/c44df083-4c64-44ad-a109-fc2a6e58d66a" />
 
 ## Project Description
 
