@@ -94,3 +94,4 @@ docs/_build/
 site/
 
 INTERVIEW_NOTES.md
+pipeline_diagram.py
