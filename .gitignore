@@ -92,3 +92,5 @@ htmlcov/
 # Documentation
 docs/_build/
 site/
+
+INTERVIEW_NOTES.md
