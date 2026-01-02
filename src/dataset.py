@@ -1,7 +1,44 @@
 """
 Heart Sound Dataset Module
 ==========================
-PyTorch Dataset class for loading and augmenting heart sound spectrograms.
+PyTorch Dataset and DataLoader implementations for heart sound classification.
+
+This module provides efficient data loading and augmentation for training
+deep learning models on heart sound spectrograms.
+
+Features:
+- Efficient memory management for large datasets
+- On-the-fly data augmentation during training
+- Support for train/validation/test splits
+- Configurable batch sizes and shuffling
+
+Data Augmentation Techniques:
+1. Time Shifting: Roll the spectrogram along time axis
+   - Simulates different recording positions
+   - Helps model learn temporal invariance
+
+2. Frequency Masking: Mask random frequency bands
+   - Forces model to use multiple frequency features
+   - Improves robustness to frequency-specific noise
+
+3. Time Masking: Mask random time frames
+   - Encourages model to use temporal context
+   - Prevents overfitting to specific patterns
+
+4. Amplitude Scaling: Randomly scale spectrogram values
+   - Simulates different recording volumes
+   - Improves generalization
+
+Usage:
+    from dataset import HeartSoundDataset, create_data_loaders
+
+    # Create dataset
+    dataset = HeartSoundDataset(spectrograms, labels, augment=True)
+
+    # Create data loaders
+    train_loader, val_loader = create_data_loaders(
+        X_train, y_train, X_val, y_val, batch_size=32
+    )
 """
 
 import numpy as np

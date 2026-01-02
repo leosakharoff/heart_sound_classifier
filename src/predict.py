@@ -3,11 +3,40 @@ Heart Sound Prediction Script
 ==============================
 Load a trained model and classify new heart sound recordings.
 
-Usage:
+This script provides inference capabilities for the heart sound classifier,
+supporting both single file and batch prediction modes with optional visualization.
+
+Features:
+- Load trained models from checkpoint files
+- Process individual audio files or entire directories
+- Generate confidence scores for predictions
+- Create visualizations of mel spectrograms with predictions
+- Support for multiple model architectures
+
+Prediction Pipeline:
+1. Load trained model checkpoint
+2. Preprocess audio (same pipeline as training)
+3. Extract mel spectrogram features
+4. Run model inference
+5. Output prediction (Normal/Abnormal) with confidence score
+
+Usage Examples:
+    # Classify a single file
     python predict.py --model_path ./models/best_model.pth --audio_path ./test.wav
-    
-    # Or classify all files in a directory:
+
+    # Classify with visualization
+    python predict.py --model_path ./models/best_model.pth --audio_path ./test.wav --visualize
+
+    # Classify all files in a directory
     python predict.py --model_path ./models/best_model.pth --audio_dir ./test_sounds/
+
+    # Batch classify with custom output
+    python predict.py --model_path ./models/best_model.pth --audio_dir ./sounds/ --output_dir ./predictions/
+
+Output:
+- For single files: Prints prediction and confidence score
+- For directories: Creates CSV with all predictions
+- With --visualize: Saves spectrogram plots with prediction overlay
 """
 
 import os

@@ -1,11 +1,44 @@
 """
 Heart Sound Classification Models
 ==================================
-CNN architectures for classifying heart sounds as normal or abnormal.
+Deep learning architectures for classifying heart sounds as normal or abnormal.
 
-Two approaches:
-1. Custom lightweight CNN - fast training, good baseline
-2. ResNet18 transfer learning - higher accuracy, slightly slower
+This module provides multiple CNN-based model architectures optimized for
+mel spectrogram input, ranging from lightweight custom designs to transfer
+learning approaches using pretrained networks.
+
+Available Models:
+1. Custom CNN (cnn) - Lightweight architecture designed for fast training
+   - 4 convolutional blocks with batch normalization
+   - Global average pooling for variable-length input
+   - ~500K parameters, trains in 5-10 minutes on CPU
+   - Accuracy: 75-80%
+
+2. Lightweight CNN (cnn_light) - Even smaller for quick prototyping
+   - 3 convolutional blocks
+   - Reduced parameter count
+   - ~200K parameters
+   - Accuracy: 70-75%
+
+3. ResNet18 (resnet) - Transfer learning from ImageNet
+   - Modified first convolutional layer for single-channel input
+   - Pretrained weights for better feature extraction
+   - ~11M parameters
+   - Accuracy: 80-85%
+
+4. CNN with Attention (attention) - Attention mechanism for focus
+   - Self-attention layers to focus on important regions
+   - Better interpretability
+   - ~600K parameters
+   - Accuracy: 78-83%
+
+Usage:
+    from model import get_model
+
+    # Get a model
+    model = get_model('cnn')
+    model = get_model('resnet')
+    model = get_model('attention')
 """
 
 import torch

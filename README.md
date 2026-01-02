@@ -1,6 +1,34 @@
 # Heart Sound Classifier 🫀
 
-A deep learning prototype for classifying heart sounds as **Normal** or **Abnormal** using mel spectrograms and CNNs.
+A deep learning prototype for classifying heart sounds as **Normal** or **Abnormal** using mel spectrograms and convolutional neural networks (CNNs).
+
+## 📖 Project Description
+
+This project implements an end-to-end machine learning pipeline for automated heart sound classification, designed to assist in the early detection of cardiac abnormalities through digital auscultation. The system processes raw audio recordings from stethoscopes, applies advanced signal processing techniques, and uses deep learning models to classify heart sounds with high accuracy.
+
+### Key Features
+
+- **Robust Signal Processing**: Implements bandpass filtering (25-400 Hz) to isolate heart sounds while removing noise and baseline wander
+- **Multiple Model Architectures**: Supports custom CNN, ResNet18, and attention-based models for different performance/complexity trade-offs
+- **Data Augmentation**: Enhances model generalization through time shifting, frequency masking, and amplitude scaling
+- **Comprehensive Evaluation**: Provides detailed metrics including accuracy, ROC-AUC, confusion matrices, and training curves
+- **Visualization**: Generates mel spectrograms and prediction visualizations for interpretability
+
+### Technical Approach
+
+The system follows a modern audio classification pipeline:
+
+1. **Audio Preprocessing**: Raw audio signals are resampled to 2000 Hz and filtered using a 5th-order Butterworth bandpass filter to preserve the frequency range of heart sounds (S1, S2 heartbeats and murmurs)
+2. **Feature Extraction**: Mel spectrograms are computed with 128 frequency bins, capturing time-frequency representations that are effective for audio classification
+3. **Deep Learning**: CNN architectures learn hierarchical patterns from spectrograms, with transfer learning from ImageNet for improved performance
+4. **Classification**: Binary classification outputs probability scores for normal vs abnormal heart sounds
+
+### Use Cases
+
+- **Medical Screening**: Assist healthcare providers in preliminary cardiac screening
+- **Telemedicine**: Enable remote heart sound analysis for patients in underserved areas
+- **Education**: Train medical students on heart sound identification
+- **Research**: Provide a baseline for developing more advanced cardiac diagnostic tools
 
 Built as a proof-of-concept for understanding digital auscultation and AI-powered diagnostic tools.
 

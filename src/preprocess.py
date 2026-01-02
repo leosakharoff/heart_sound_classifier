@@ -1,12 +1,38 @@
 """
 Heart Sound Preprocessing Module
 ================================
-Handles audio loading, filtering, and feature extraction for heart sound classification.
+Comprehensive audio preprocessing pipeline for heart sound classification.
 
-Key components:
-- Bandpass filtering (25-400 Hz) to isolate heart sound frequencies
-- Mel spectrogram extraction for CNN input
-- Segmentation into fixed-length windows
+This module handles the entire signal processing pipeline from raw audio
+recordings to mel spectrogram features ready for deep learning models.
+
+Key Processing Steps:
+1. Audio Loading: Load WAV files and resample to 2000 Hz (standard for heart sounds)
+2. Bandpass Filtering: Apply 5th-order Butterworth filter (25-400 Hz)
+   - Removes low-frequency baseline wander and breathing sounds
+   - Removes high-frequency noise and interference
+   - Preserves S1, S2 heartbeats and murmurs
+3. Amplitude Normalization: Scale to [-1, 1] range
+4. Mel Spectrogram Extraction: Convert to time-frequency representation
+   - 128 mel frequency bins
+   - Captures perceptually relevant features
+5. Segmentation: Split into fixed-length windows (5 seconds, 50% overlap)
+
+Why This Pipeline Works:
+- Heart sounds primarily occupy 25-400 Hz frequency range
+- Mel scale approximates human auditory perception
+- Spectrograms preserve temporal and frequency patterns
+- CNNs excel at learning patterns from spectrogram representations
+
+Usage:
+    from preprocess import HeartSoundPreprocessor, preprocess_dataset
+
+    # Preprocess a single file
+    preprocessor = HeartSoundPreprocessor()
+    spectrogram = preprocessor.process('heart_sound.wav')
+
+    # Preprocess multiple files
+    spectrograms, labels = preprocess_dataset(audio_files, labels, preprocessor)
 """
 
 import numpy as np

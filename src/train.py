@@ -1,10 +1,28 @@
 """
 Heart Sound Classifier Training Script
 =======================================
-Trains a CNN model to classify heart sounds as normal or abnormal.
+Trains deep learning models to classify heart sounds as normal or abnormal.
+
+This script implements a complete training pipeline for heart sound classification,
+including data loading, preprocessing, model training, validation, and evaluation.
+
+Features:
+- Loads PhysioNet 2016 dataset from multiple training sets
+- Applies bandpass filtering and mel spectrogram extraction
+- Supports multiple model architectures (CNN, ResNet18, Attention)
+- Implements data augmentation for improved generalization
+- Provides comprehensive evaluation metrics and visualizations
+- Saves best model checkpoint and training history
 
 Usage:
-    python train.py --data_dir ./data/physionet_2016 --epochs 20 --model cnn
+    # Quick training with limited data
+    python train.py --data_dir ./data/physionet_2016 --epochs 10 --max_files 200
+
+    # Full training with all data
+    python train.py --data_dir ./data/physionet_2016 --epochs 20 --model resnet
+
+    # Custom configuration
+    python train.py --data_dir ./data/physionet_2016 --epochs 30 --batch_size 64 --lr 0.0001
 """
 
 import os
