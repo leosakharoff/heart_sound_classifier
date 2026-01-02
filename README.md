@@ -1,8 +1,8 @@
-# Heart Sound Classifier 🫀
+# Heart Sound Classifier
 
 A deep learning prototype for classifying heart sounds as **Normal** or **Abnormal** using mel spectrograms and convolutional neural networks (CNNs).
 
-## 📖 Project Description
+## Project Description
 
 This project implements an end-to-end machine learning pipeline for automated heart sound classification, designed to assist in the early detection of cardiac abnormalities through digital auscultation. The system processes raw audio recordings from stethoscopes, applies advanced signal processing techniques, and uses deep learning models to classify heart sounds with high accuracy.
 
@@ -32,7 +32,7 @@ The system follows a modern audio classification pipeline:
 
 Built as a proof-of-concept for understanding digital auscultation and AI-powered diagnostic tools.
 
-## 🎯 What This Does
+## What This Does
 
 ```
 Audio Recording (.wav) → Preprocessing → Mel Spectrogram → CNN → Normal/Abnormal
@@ -44,7 +44,7 @@ Audio Recording (.wav) → Preprocessing → Mel Spectrogram → CNN → Normal/
 4. **Classifies** using a CNN (custom lightweight or ResNet18)
 5. **Outputs** prediction with confidence score
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Install Dependencies
 
@@ -92,7 +92,7 @@ python predict.py --audio_path /path/to/heart_sound.wav --visualize
 python predict.py --audio_dir /path/to/sounds/ --visualize
 ```
 
-## 📊 Expected Results
+## Expected Results
 
 | Model | Accuracy | Training Time (CPU) |
 |-------|----------|---------------------|
@@ -106,7 +106,7 @@ State-of-the-art on this dataset is ~90%, achieved with:
 - Ensemble methods
 - Transformer architectures
 
-## 🧠 Technical Details
+## Technical Details
 
 ### Signal Processing Pipeline
 
@@ -143,7 +143,7 @@ During training:
 - Time masking (mask random time frames)
 - Amplitude scaling
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 heart_sound_classifier/
@@ -162,7 +162,7 @@ heart_sound_classifier/
 └── README.md
 ```
 
-## 🔬 Dataset: PhysioNet 2016
+## Dataset: PhysioNet 2016
 
 The [PhysioNet/CinC 2016 Challenge](https://physionet.org/content/challenge-2016/1.0.0/) dataset:
 
@@ -174,7 +174,7 @@ The [PhysioNet/CinC 2016 Challenge](https://physionet.org/content/challenge-2016
 
 Abnormalities include murmurs from various conditions.
 
-## 🏥 Relevance to AUSCORA
+## Relevance to AUSCORA
 
 This prototype demonstrates understanding of:
 
@@ -191,7 +191,7 @@ This prototype demonstrates understanding of:
 - EU MDR regulatory compliance
 - Extensive clinical validation
 
-## 📚 References
+## References
 
 - [PhysioNet 2016 Challenge](https://physionet.org/content/challenge-2016/1.0.0/)
 - [Deep Learning for Heart Sound Classification](https://www.ahajournals.org/doi/10.1161/JAHA.120.019905)
