@@ -1,28 +1,6 @@
 """
-Heart Sound Classifier Training Script
-=======================================
-Trains deep learning models to classify heart sounds as normal or abnormal.
-
-This script implements a complete training pipeline for heart sound classification,
-including data loading, preprocessing, model training, validation, and evaluation.
-
-Features:
-- Loads PhysioNet 2016 dataset from multiple training sets
-- Applies bandpass filtering and mel spectrogram extraction
-- Supports multiple model architectures (CNN, ResNet18, Attention)
-- Implements data augmentation for improved generalization
-- Provides comprehensive evaluation metrics and visualizations
-- Saves best model checkpoint and training history
-
-Usage:
-    # Quick training with limited data
-    python train.py --data_dir ./data/physionet_2016 --epochs 10 --max_files 200
-
-    # Full training with all data
-    python train.py --data_dir ./data/physionet_2016 --epochs 20 --model resnet
-
-    # Custom configuration
-    python train.py --data_dir ./data/physionet_2016 --epochs 30 --batch_size 64 --lr 0.0001
+Trains CNN models to classify heart sounds as normal or abnormal.
+Loads PhysioNet 2016 data, preprocesses audio, and saves the best model.
 """
 
 import os
@@ -46,20 +24,7 @@ from model import get_model, count_parameters
 
 
 def load_physionet_data(data_dir: str, max_files: int = None):
-    """
-    Load PhysioNet 2016 heart sound data.
-    
-    The dataset structure:
-    - training-a/, training-b/, etc. folders
-    - Each contains .wav files and REFERENCE.csv with labels
-    
-    Args:
-        data_dir: Path to PhysioNet data directory
-        max_files: Maximum number of files to load (for quick testing)
-        
-    Returns:
-        Tuple of (audio_files, labels)
-    """
+    """Load audio files and labels from PhysioNet 2016 dataset."""
     audio_files = []
     labels = []
     
@@ -113,7 +78,7 @@ def train_epoch(
     optimizer: optim.Optimizer,
     device: torch.device,
 ) -> float:
-    """Train for one epoch."""
+    """Run one training epoch."""
     model.train()
     total_loss = 0.0
     
@@ -141,7 +106,7 @@ def validate(
     criterion: nn.Module,
     device: torch.device,
 ) -> tuple:
-    """Validate model."""
+    """Evaluate model on validation set."""
     model.eval()
     total_loss = 0.0
     all_preds = []
@@ -180,19 +145,7 @@ def train(
     max_files: int = None,
     device: str = 'auto',
 ):
-    """
-    Main training function.
-    
-    Args:
-        data_dir: Path to PhysioNet data
-        output_dir: Directory to save model and results
-        model_type: Model architecture ('cnn', 'resnet', 'attention')
-        epochs: Number of training epochs
-        batch_size: Batch size
-        learning_rate: Initial learning rate
-        max_files: Limit number of files (for quick testing)
-        device: Device to train on ('auto', 'cpu', 'cuda')
-    """
+    """Train the model and save results."""
     # Create output directory
     os.makedirs(output_dir, exist_ok=True)
     
@@ -346,7 +299,7 @@ def train(
 
 
 def plot_training_curves(history: dict, output_dir: str):
-    """Plot and save training curves."""
+    """Save loss and accuracy plots."""
     fig, axes = plt.subplots(1, 2, figsize=(12, 4))
     
     # Loss plot

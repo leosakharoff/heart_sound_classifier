@@ -1,44 +1,6 @@
 """
-Heart Sound Classification Models
-==================================
-Deep learning architectures for classifying heart sounds as normal or abnormal.
-
-This module provides multiple CNN-based model architectures optimized for
-mel spectrogram input, ranging from lightweight custom designs to transfer
-learning approaches using pretrained networks.
-
-Available Models:
-1. Custom CNN (cnn) - Lightweight architecture designed for fast training
-   - 4 convolutional blocks with batch normalization
-   - Global average pooling for variable-length input
-   - ~500K parameters, trains in 5-10 minutes on CPU
-   - Accuracy: 75-80%
-
-2. Lightweight CNN (cnn_light) - Even smaller for quick prototyping
-   - 3 convolutional blocks
-   - Reduced parameter count
-   - ~200K parameters
-   - Accuracy: 70-75%
-
-3. ResNet18 (resnet) - Transfer learning from ImageNet
-   - Modified first convolutional layer for single-channel input
-   - Pretrained weights for better feature extraction
-   - ~11M parameters
-   - Accuracy: 80-85%
-
-4. CNN with Attention (attention) - Attention mechanism for focus
-   - Self-attention layers to focus on important regions
-   - Better interpretability
-   - ~600K parameters
-   - Accuracy: 78-83%
-
-Usage:
-    from model import get_model
-
-    # Get a model
-    model = get_model('cnn')
-    model = get_model('resnet')
-    model = get_model('attention')
+CNN architectures for heart sound classification.
+Includes lightweight CNN, ResNet18, and attention-based models.
 """
 
 import torch
@@ -49,19 +11,7 @@ from typing import Tuple
 
 
 class HeartSoundCNN(nn.Module):
-    """
-    Custom lightweight CNN for heart sound classification.
-    
-    Architecture designed for spectrogram input:
-    - 4 convolutional blocks with batch norm and max pooling
-    - Global average pooling to handle variable-length input
-    - Fully connected classifier with dropout
-    
-    Optimized for:
-    - Fast training on CPU
-    - Small model size
-    - Reasonable accuracy (~75-80%)
-    """
+    """4-layer CNN for spectrogram classification. Fast to train, ~500K params."""
     
     def __init__(
         self,
@@ -96,7 +46,6 @@ class HeartSoundCNN(nn.Module):
         self._init_weights()
     
     def _conv_block(self, in_channels: int, out_channels: int) -> nn.Sequential:
-        """Create a convolutional block with BatchNorm and MaxPool."""
         return nn.Sequential(
             nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1),
             nn.BatchNorm2d(out_channels),
@@ -108,7 +57,6 @@ class HeartSoundCNN(nn.Module):
         )
     
     def _init_weights(self):
-        """Initialize model weights using Kaiming initialization."""
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
@@ -120,15 +68,6 @@ class HeartSoundCNN(nn.Module):
                 nn.init.constant_(m.bias, 0)
     
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """
-        Forward pass.
-        
-        Args:
-            x: Input tensor of shape (batch, 1, n_mels, time_frames)
-            
-        Returns:
-            Logits of shape (batch, num_classes)
-        """
         x = self.conv1(x)
         x = self.conv2(x)
         x = self.conv3(x)
@@ -138,24 +77,12 @@ class HeartSoundCNN(nn.Module):
         return x
     
     def predict_proba(self, x: torch.Tensor) -> torch.Tensor:
-        """Get prediction probabilities."""
         logits = self.forward(x)
         return F.softmax(logits, dim=1)
 
 
 class HeartSoundResNet(nn.Module):
-    """
-    ResNet18-based model for heart sound classification.
-    
-    Uses transfer learning from ImageNet pretrained weights:
-    - Modify first conv layer for single-channel input
-    - Replace final FC layer for binary classification
-    
-    Benefits:
-    - Higher accuracy (~80-85%)
-    - Robust feature extraction
-    - Well-tested architecture
-    """
+    """ResNet18 adapted for single-channel spectrograms. Higher accuracy, ~11M params."""
     
     def __init__(
         self,
@@ -197,20 +124,15 @@ class HeartSoundResNet(nn.Module):
                     param.requires_grad = False
     
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass through ResNet."""
         return self.resnet(x)
     
     def predict_proba(self, x: torch.Tensor) -> torch.Tensor:
-        """Get prediction probabilities."""
         logits = self.forward(x)
         return F.softmax(logits, dim=1)
 
 
 class AttentionBlock(nn.Module):
-    """
-    Simple attention mechanism for spectrograms.
-    Learns to focus on relevant time-frequency regions.
-    """
+    """Learns to focus on important time-frequency regions."""
     
     def __init__(self, channels: int):
         super(AttentionBlock, self).__init__()
@@ -227,23 +149,7 @@ class AttentionBlock(nn.Module):
 
 
 class HeartSoundCNNLight(nn.Module):
-    """
-    Lightweight CNN for heart sound classification.
-
-    Designed for smaller datasets where overfitting is a concern.
-    ~100K parameters (vs 1.2M in HeartSoundCNN).
-
-    Architecture:
-    - 3 convolutional blocks (vs 4 in full CNN)
-    - Fewer channels per layer
-    - Simpler classifier head
-    - Global average pooling for variable-length input
-
-    Best suited for:
-    - Datasets with < 10K samples
-    - Faster training on CPU
-    - Baseline comparison
-    """
+    """Smaller 3-layer CNN. Good for small datasets, ~100K params."""
 
     def __init__(
         self,
@@ -272,7 +178,6 @@ class HeartSoundCNNLight(nn.Module):
         self._init_weights()
 
     def _conv_block(self, in_channels: int, out_channels: int) -> nn.Sequential:
-        """Create a convolutional block with BatchNorm and MaxPool."""
         return nn.Sequential(
             nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1),
             nn.BatchNorm2d(out_channels),
@@ -281,7 +186,6 @@ class HeartSoundCNNLight(nn.Module):
         )
 
     def _init_weights(self):
-        """Initialize model weights using Kaiming initialization."""
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
@@ -293,15 +197,6 @@ class HeartSoundCNNLight(nn.Module):
                 nn.init.constant_(m.bias, 0)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """
-        Forward pass.
-
-        Args:
-            x: Input tensor of shape (batch, 1, n_mels, time_frames)
-
-        Returns:
-            Logits of shape (batch, num_classes)
-        """
         x = self.conv1(x)
         x = self.conv2(x)
         x = self.conv3(x)
@@ -310,16 +205,12 @@ class HeartSoundCNNLight(nn.Module):
         return x
 
     def predict_proba(self, x: torch.Tensor) -> torch.Tensor:
-        """Get prediction probabilities."""
         logits = self.forward(x)
         return F.softmax(logits, dim=1)
 
 
 class HeartSoundCNNWithAttention(nn.Module):
-    """
-    CNN with attention mechanism for better feature localization.
-    Attention helps the model focus on relevant heart sound events.
-    """
+    """CNN with attention to focus on relevant heart sound events."""
     
     def __init__(
         self,
@@ -372,17 +263,7 @@ def get_model(
     num_classes: int = 2,
     pretrained: bool = True,
 ) -> nn.Module:
-    """
-    Factory function to get model by name.
-    
-    Args:
-        model_type: One of 'cnn', 'cnn_light', 'resnet', 'attention'
-        num_classes: Number of output classes
-        pretrained: Whether to use pretrained weights (for ResNet)
-        
-    Returns:
-        Initialized model
-    """
+    """Get a model by name: 'cnn', 'cnn_light', 'resnet', or 'attention'."""
     if model_type == 'cnn':
         return HeartSoundCNN(num_classes=num_classes)
     elif model_type == 'cnn_light':
@@ -396,12 +277,7 @@ def get_model(
 
 
 def count_parameters(model: nn.Module) -> Tuple[int, int]:
-    """
-    Count model parameters.
-    
-    Returns:
-        Tuple of (total params, trainable params)
-    """
+    """Return (total params, trainable params)."""
     total = sum(p.numel() for p in model.parameters())
     trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
     return total, trainable

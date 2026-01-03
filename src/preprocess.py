@@ -1,38 +1,6 @@
 """
-Heart Sound Preprocessing Module
-================================
-Comprehensive audio preprocessing pipeline for heart sound classification.
-
-This module handles the entire signal processing pipeline from raw audio
-recordings to mel spectrogram features ready for deep learning models.
-
-Key Processing Steps:
-1. Audio Loading: Load WAV files and resample to 2000 Hz (standard for heart sounds)
-2. Bandpass Filtering: Apply 5th-order Butterworth filter (25-400 Hz)
-   - Removes low-frequency baseline wander and breathing sounds
-   - Removes high-frequency noise and interference
-   - Preserves S1, S2 heartbeats and murmurs
-3. Amplitude Normalization: Scale to [-1, 1] range
-4. Mel Spectrogram Extraction: Convert to time-frequency representation
-   - 128 mel frequency bins
-   - Captures perceptually relevant features
-5. Segmentation: Split into fixed-length windows (5 seconds, 50% overlap)
-
-Why This Pipeline Works:
-- Heart sounds primarily occupy 25-400 Hz frequency range
-- Mel scale approximates human auditory perception
-- Spectrograms preserve temporal and frequency patterns
-- CNNs excel at learning patterns from spectrogram representations
-
-Usage:
-    from preprocess import HeartSoundPreprocessor, preprocess_dataset
-
-    # Preprocess a single file
-    preprocessor = HeartSoundPreprocessor()
-    spectrogram = preprocessor.process('heart_sound.wav')
-
-    # Preprocess multiple files
-    spectrograms, labels = preprocess_dataset(audio_files, labels, preprocessor)
+Audio preprocessing for heart sound classification.
+Handles filtering, normalization, and mel spectrogram extraction.
 """
 
 import numpy as np
@@ -44,15 +12,7 @@ warnings.filterwarnings('ignore')
 
 
 class HeartSoundPreprocessor:
-    """
-    Preprocesses heart sound recordings for classification.
-    
-    Pipeline:
-    1. Load audio and resample to target sample rate
-    2. Apply bandpass filter to isolate heart sound frequencies
-    3. Normalize amplitude
-    4. Extract mel spectrogram features
-    """
+    """Converts raw audio to mel spectrograms for the classifier."""
     
     def __init__(
         self,
@@ -64,18 +24,6 @@ class HeartSoundPreprocessor:
         hop_length: int = 128,
         segment_duration: float = 5.0,
     ):
-        """
-        Initialize preprocessor with audio parameters.
-        
-        Args:
-            target_sr: Target sample rate (2000 Hz standard for heart sounds)
-            lowcut: Lower cutoff frequency for bandpass filter
-            highcut: Upper cutoff frequency for bandpass filter
-            n_mels: Number of mel frequency bins
-            n_fft: FFT window size
-            hop_length: Hop length for spectrogram
-            segment_duration: Duration of each segment in seconds
-        """
         self.target_sr = target_sr
         self.lowcut = lowcut
         self.highcut = highcut
@@ -89,7 +37,6 @@ class HeartSoundPreprocessor:
         self._compute_filter_coefficients()
     
     def _compute_filter_coefficients(self):
-        """Compute Butterworth bandpass filter coefficients."""
         nyquist = 0.5 * self.target_sr
         low = self.lowcut / nyquist
         high = self.highcut / nyquist
@@ -101,34 +48,12 @@ class HeartSoundPreprocessor:
         self.b, self.a = butter(5, [low, high], btype='band')
     
     def load_audio(self, audio_path: str) -> Tuple[np.ndarray, int]:
-        """
-        Load audio file and resample to target sample rate.
-        
-        Args:
-            audio_path: Path to audio file (.wav, .mp3, etc.)
-            
-        Returns:
-            Tuple of (audio signal, sample rate)
-        """
+        """Load and resample audio file."""
         y, sr = librosa.load(audio_path, sr=self.target_sr, mono=True)
         return y, sr
     
     def bandpass_filter(self, y: np.ndarray) -> np.ndarray:
-        """
-        Apply bandpass filter to isolate heart sound frequencies.
-        
-        Heart sounds (S1, S2) are typically in 20-150 Hz range.
-        Murmurs can extend up to 400 Hz.
-        This filter removes:
-        - Low-frequency baseline wander
-        - High-frequency noise and artifacts
-        
-        Args:
-            y: Audio signal
-            
-        Returns:
-            Filtered audio signal
-        """
+        """Filter to keep only heart sound frequencies (25-400 Hz)."""
         # Handle edge case of very short signals
         if len(y) < 50:
             return y
@@ -142,33 +67,14 @@ class HeartSoundPreprocessor:
         return y_filtered
     
     def normalize(self, y: np.ndarray) -> np.ndarray:
-        """
-        Normalize audio to [-1, 1] range.
-        
-        Args:
-            y: Audio signal
-            
-        Returns:
-            Normalized audio signal
-        """
+        """Scale audio to [-1, 1] range."""
         max_val = np.max(np.abs(y))
         if max_val > 0:
             return y / max_val
         return y
     
     def extract_mel_spectrogram(self, y: np.ndarray) -> np.ndarray:
-        """
-        Extract log-mel spectrogram from audio signal.
-        
-        The mel scale approximates human auditory perception,
-        making it effective for audio classification tasks.
-        
-        Args:
-            y: Audio signal
-            
-        Returns:
-            Log-mel spectrogram (n_mels x time_frames)
-        """
+        """Convert audio to log-mel spectrogram."""
         # Compute mel spectrogram
         mel_spec = librosa.feature.melspectrogram(
             y=y,
@@ -190,19 +96,7 @@ class HeartSoundPreprocessor:
         y: np.ndarray, 
         overlap: float = 0.5
     ) -> list:
-        """
-        Segment audio into fixed-length windows.
-        
-        This ensures consistent input size for the neural network
-        and increases training data through overlapping windows.
-        
-        Args:
-            y: Audio signal
-            overlap: Overlap fraction between segments (0.5 = 50%)
-            
-        Returns:
-            List of audio segments
-        """
+        """Split audio into fixed-length overlapping windows."""
         segments = []
         step = int(self.segment_samples * (1 - overlap))
         
@@ -224,19 +118,7 @@ class HeartSoundPreprocessor:
         audio_path: str,
         return_segments: bool = True
     ) -> dict:
-        """
-        Complete preprocessing pipeline for a single audio file.
-        
-        Args:
-            audio_path: Path to audio file
-            return_segments: If True, return segmented spectrograms
-            
-        Returns:
-            Dictionary containing:
-            - 'spectrograms': List of mel spectrograms
-            - 'audio': Preprocessed audio signal
-            - 'sr': Sample rate
-        """
+        """Run full preprocessing pipeline on an audio file."""
         # Load audio
         y, sr = self.load_audio(audio_path)
         
@@ -267,18 +149,7 @@ def preprocess_dataset(
     preprocessor: HeartSoundPreprocessor,
     verbose: bool = True
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """
-    Preprocess entire dataset of audio files.
-    
-    Args:
-        audio_files: List of paths to audio files
-        labels: List of labels (0=normal, 1=abnormal)
-        preprocessor: HeartSoundPreprocessor instance
-        verbose: Print progress
-        
-    Returns:
-        Tuple of (spectrograms array, labels array)
-    """
+    """Preprocess a list of audio files and return spectrograms with labels."""
     all_spectrograms = []
     all_labels = []
     

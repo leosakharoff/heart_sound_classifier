@@ -1,42 +1,6 @@
 """
-Heart Sound Prediction Script
-==============================
-Load a trained model and classify new heart sound recordings.
-
-This script provides inference capabilities for the heart sound classifier,
-supporting both single file and batch prediction modes with optional visualization.
-
-Features:
-- Load trained models from checkpoint files
-- Process individual audio files or entire directories
-- Generate confidence scores for predictions
-- Create visualizations of mel spectrograms with predictions
-- Support for multiple model architectures
-
-Prediction Pipeline:
-1. Load trained model checkpoint
-2. Preprocess audio (same pipeline as training)
-3. Extract mel spectrogram features
-4. Run model inference
-5. Output prediction (Normal/Abnormal) with confidence score
-
-Usage Examples:
-    # Classify a single file
-    python predict.py --model_path ./models/best_model.pth --audio_path ./test.wav
-
-    # Classify with visualization
-    python predict.py --model_path ./models/best_model.pth --audio_path ./test.wav --visualize
-
-    # Classify all files in a directory
-    python predict.py --model_path ./models/best_model.pth --audio_dir ./test_sounds/
-
-    # Batch classify with custom output
-    python predict.py --model_path ./models/best_model.pth --audio_dir ./sounds/ --output_dir ./predictions/
-
-Output:
-- For single files: Prints prediction and confidence score
-- For directories: Creates CSV with all predictions
-- With --visualize: Saves spectrogram plots with prediction overlay
+Classify heart sounds using a trained model.
+Supports single files or batch prediction with optional visualization.
 """
 
 import os
@@ -52,14 +16,7 @@ from model import get_model
 
 
 class HeartSoundClassifier:
-    """
-    Production-ready heart sound classifier.
-    
-    Loads a trained model and provides methods for:
-    - Single file prediction
-    - Batch prediction
-    - Visualization of predictions
-    """
+    """Loads a trained model and classifies heart sound recordings."""
     
     def __init__(
         self,
@@ -67,14 +24,6 @@ class HeartSoundClassifier:
         model_type: str = 'cnn_light',
         device: str = 'auto',
     ):
-        """
-        Initialize classifier.
-        
-        Args:
-            model_path: Path to saved model checkpoint
-            model_type: Model architecture ('cnn', 'resnet', 'attention')
-            device: Device to run inference on
-        """
         # Set device
         if device == 'auto':
             self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -103,20 +52,7 @@ class HeartSoundClassifier:
         self.labels = ['Normal', 'Abnormal']
     
     def predict(self, audio_path: str) -> dict:
-        """
-        Classify a single audio file.
-        
-        Args:
-            audio_path: Path to audio file
-            
-        Returns:
-            Dictionary with prediction results:
-            - 'class': Predicted class (0=Normal, 1=Abnormal)
-            - 'label': Class label string
-            - 'confidence': Prediction confidence
-            - 'probabilities': Class probabilities [P(Normal), P(Abnormal)]
-            - 'num_segments': Number of segments analyzed
-        """
+        """Classify an audio file. Returns class, confidence, and probabilities."""
         # Preprocess audio
         result = self.preprocessor.process_file(audio_path, return_segments=True)
         spectrograms = result['spectrograms']
@@ -160,15 +96,7 @@ class HeartSoundClassifier:
         }
     
     def predict_batch(self, audio_paths: list) -> list:
-        """
-        Classify multiple audio files.
-        
-        Args:
-            audio_paths: List of paths to audio files
-            
-        Returns:
-            List of prediction dictionaries
-        """
+        """Classify multiple audio files."""
         results = []
         for path in audio_paths:
             try:
@@ -188,22 +116,7 @@ class HeartSoundClassifier:
         output_path: Optional[str] = None,
         show: bool = True,
     ) -> dict:
-        """
-        Classify audio and visualize the result.
-        
-        Creates a figure showing:
-        - Original waveform
-        - Mel spectrogram
-        - Prediction with confidence
-        
-        Args:
-            audio_path: Path to audio file
-            output_path: Path to save figure (optional)
-            show: Whether to display the figure
-            
-        Returns:
-            Prediction dictionary
-        """
+        """Classify and plot waveform + spectrogram with prediction overlay."""
         # Get preprocessed audio
         result = self.preprocessor.process_file(audio_path, return_segments=True)
         audio = result['audio']

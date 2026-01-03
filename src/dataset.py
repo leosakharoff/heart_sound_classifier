@@ -1,44 +1,6 @@
 """
-Heart Sound Dataset Module
-==========================
-PyTorch Dataset and DataLoader implementations for heart sound classification.
-
-This module provides efficient data loading and augmentation for training
-deep learning models on heart sound spectrograms.
-
-Features:
-- Efficient memory management for large datasets
-- On-the-fly data augmentation during training
-- Support for train/validation/test splits
-- Configurable batch sizes and shuffling
-
-Data Augmentation Techniques:
-1. Time Shifting: Roll the spectrogram along time axis
-   - Simulates different recording positions
-   - Helps model learn temporal invariance
-
-2. Frequency Masking: Mask random frequency bands
-   - Forces model to use multiple frequency features
-   - Improves robustness to frequency-specific noise
-
-3. Time Masking: Mask random time frames
-   - Encourages model to use temporal context
-   - Prevents overfitting to specific patterns
-
-4. Amplitude Scaling: Randomly scale spectrogram values
-   - Simulates different recording volumes
-   - Improves generalization
-
-Usage:
-    from dataset import HeartSoundDataset, create_data_loaders
-
-    # Create dataset
-    dataset = HeartSoundDataset(spectrograms, labels, augment=True)
-
-    # Create data loaders
-    train_loader, val_loader = create_data_loaders(
-        X_train, y_train, X_val, y_val, batch_size=32
-    )
+PyTorch Dataset for heart sound spectrograms.
+Includes data augmentation (time shift, masking, scaling).
 """
 
 import numpy as np
@@ -49,14 +11,7 @@ import random
 
 
 class HeartSoundDataset(Dataset):
-    """
-    PyTorch Dataset for heart sound spectrograms.
-    
-    Handles:
-    - Loading preprocessed spectrograms
-    - Data augmentation (time shift, frequency masking)
-    - Converting to PyTorch tensors
-    """
+    """Wraps spectrograms and labels for PyTorch training."""
     
     def __init__(
         self,
@@ -65,15 +20,6 @@ class HeartSoundDataset(Dataset):
         transform: Optional[Callable] = None,
         augment: bool = False,
     ):
-        """
-        Initialize dataset.
-        
-        Args:
-            spectrograms: Array of mel spectrograms (N, n_mels, time_frames)
-            labels: Array of labels (0=normal, 1=abnormal)
-            transform: Optional transform function
-            augment: Whether to apply data augmentation
-        """
         self.spectrograms = spectrograms
         self.labels = labels
         self.transform = transform
@@ -83,12 +29,6 @@ class HeartSoundDataset(Dataset):
         return len(self.spectrograms)
     
     def __getitem__(self, idx: int) -> Tuple[torch.Tensor, int]:
-        """
-        Get a single sample.
-        
-        Returns:
-            Tuple of (spectrogram tensor, label)
-        """
         spec = self.spectrograms[idx].copy()
         label = self.labels[idx]
         
@@ -110,7 +50,6 @@ class HeartSoundDataset(Dataset):
         return spec_tensor, label
     
     def _normalize(self, spec: np.ndarray) -> np.ndarray:
-        """Normalize spectrogram to [0, 1] range."""
         spec_min = spec.min()
         spec_max = spec.max()
         if spec_max - spec_min > 0:
@@ -118,14 +57,7 @@ class HeartSoundDataset(Dataset):
         return spec - spec_min
     
     def _augment(self, spec: np.ndarray) -> np.ndarray:
-        """
-        Apply data augmentation to spectrogram.
-        
-        Augmentations help the model generalize better:
-        - Time shift: Simulate recordings starting at different points
-        - Frequency masking: Make model robust to missing frequency bands
-        - Time masking: Make model robust to brief interruptions
-        """
+        """Apply random augmentations: time shift, freq/time masking, scaling."""
         # Time shift (roll along time axis)
         if random.random() > 0.5:
             shift = random.randint(-spec.shape[1]//10, spec.shape[1]//10)
@@ -161,20 +93,7 @@ def create_data_loaders(
     batch_size: int = 32,
     num_workers: int = 0,
 ) -> Tuple[DataLoader, DataLoader]:
-    """
-    Create train and validation data loaders.
-    
-    Args:
-        X_train: Training spectrograms
-        y_train: Training labels
-        X_val: Validation spectrograms
-        y_val: Validation labels
-        batch_size: Batch size for training
-        num_workers: Number of worker processes
-        
-    Returns:
-        Tuple of (train_loader, val_loader)
-    """
+    """Create train and validation DataLoaders with augmentation on train set."""
     train_dataset = HeartSoundDataset(X_train, y_train, augment=True)
     val_dataset = HeartSoundDataset(X_val, y_val, augment=False)
     
@@ -198,12 +117,7 @@ def create_data_loaders(
 
 
 class BalancedSampler(torch.utils.data.Sampler):
-    """
-    Sampler that balances class distribution in each batch.
-    
-    Important for heart sound classification where abnormal samples
-    are often underrepresented.
-    """
+    """Oversamples minority class to balance batches."""
     
     def __init__(self, labels: np.ndarray):
         self.labels = labels

@@ -1,17 +1,7 @@
 #!/usr/bin/env python3
 """
-Quick Demo Script
-=================
-Demonstrates the heart sound classifier without requiring the full dataset.
-Uses synthetic heart sounds for demonstration purposes.
-
-This is useful for:
-- Testing the pipeline quickly
-- Demonstrating the concept
-- Verifying  code works correctly
-
-Usage:
-    python demo.py
+Demo using synthetic heart sounds. No dataset required.
+Generates fake normal/abnormal sounds and trains a quick model.
 """
 
 import os
@@ -35,24 +25,7 @@ def generate_synthetic_heart_sound(
     add_murmur: bool = False,
     noise_level: float = 0.1,
 ) -> np.ndarray:
-    """
-    Generate a synthetic heart sound for demonstration.
-    
-    This creates a simple simulation of heart sounds:
-    - S1 (lub): Lower frequency, longer duration
-    - S2 (dub): Higher frequency, shorter duration
-    - Optional murmur: Turbulent sound between S1 and S2
-    
-    Args:
-        duration: Duration in seconds
-        sr: Sample rate
-        heart_rate: Heart rate in BPM
-        add_murmur: Whether to add a systolic murmur
-        noise_level: Amount of background noise
-        
-    Returns:
-        Synthetic heart sound signal
-    """
+    """Create a fake heart sound with S1/S2 beats and optional murmur."""
     t = np.linspace(0, duration, int(sr * duration))
     signal = np.zeros_like(t)
     
@@ -114,7 +87,6 @@ def generate_synthetic_heart_sound(
 
 
 def demo():
-    """Run the demonstration."""
     print("=" * 60)
     print("HEART SOUND CLASSIFIER - DEMO")
     print("=" * 60)
