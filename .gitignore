@@ -70,6 +70,8 @@ mlruns/
 results/
 predictions/
 demo_output/
+models/*.json
+models/*.png
 *.png
 *.jpg
 *.jpeg

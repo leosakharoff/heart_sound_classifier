@@ -1,40 +1,29 @@
 # Heart Sound Classifier
 
-A deep learning prototype for classifying heart sounds as **Normal** or **Abnormal** using mel spectrograms and convolutional neural networks (CNNs).
-<img width="2100" height="1200" alt="example_sounds" src="https://github.com/user-attachments/assets/3f03c81e-92e7-4c28-aaf1-8dac979d49e2" />
-<img width="1800" height="600" alt="training_curves" src="https://github.com/user-attachments/assets/f29320e0-981e-4e77-93f5-b30cfa370909" />
-<img width="2063" height="1185" alt="preprocessing_diagram" src="https://github.com/user-attachments/assets/3cb591ec-bb3b-429c-adbe-6ba4387a5f36" />
-<img width="2085" height="1335" alt="model_architecture" src="https://github.com/user-attachments/assets/c44df083-4c64-44ad-a109-fc2a6e58d66a" />
+A deep learning system for classifying heart sounds as **Normal** or **Abnormal** using mel spectrograms and convolutional neural networks (CNNs).
 
-## Project Description
+## Overview
 
-This project implements an end-to-end machine learning pipeline for automated heart sound classification, designed to assist in the early detection of cardiac abnormalities through digital auscultation. The system processes raw audio recordings from stethoscopes, applies advanced signal processing techniques, and uses deep learning models to classify heart sounds with high accuracy.
+This project implements a complete machine learning pipeline for automated heart sound classification through digital auscultation. The system processes raw phonocardiogram (PCG) recordings, applies signal processing techniques, and uses deep learning models to detect cardiac abnormalities.
 
 ### Key Features
 
-- **Robust Signal Processing**: Implements bandpass filtering (25-400 Hz) to isolate heart sounds while removing noise and baseline wander
-- **Multiple Model Architectures**: Supports custom CNN, ResNet18, and attention-based models for different performance/complexity trade-offs
-- **Data Augmentation**: Enhances model generalization through time shifting, frequency masking, and amplitude scaling
-- **Comprehensive Evaluation**: Provides detailed metrics including accuracy, ROC-AUC, confusion matrices, and training curves
-- **Visualization**: Generates mel spectrograms and prediction visualizations for interpretability
+- **Robust Signal Processing**: Bandpass filtering (25-400 Hz) to isolate heart sounds while removing noise
+- **Multiple Model Architectures**: Custom CNN, ResNet18, and attention-based models
+- **Data Augmentation**: Time shifting, frequency masking, and amplitude scaling for improved generalization
+- **Comprehensive Evaluation**: Accuracy, ROC-AUC, confusion matrices, and training curves
+- **Interpretability**: Mel spectrogram visualization for model insights
 
-### Technical Approach
+### Technical Pipeline
 
-The system follows a modern audio classification pipeline:
+```
+Audio Recording → Bandpass Filter → Mel Spectrogram → CNN → Classification
+```
 
-1. **Audio Preprocessing**: Raw audio signals are resampled to 2000 Hz and filtered using a 5th-order Butterworth bandpass filter to preserve the frequency range of heart sounds (S1, S2 heartbeats and murmurs)
-2. **Feature Extraction**: Mel spectrograms are computed with 128 frequency bins, capturing time-frequency representations that are effective for audio classification
-3. **Deep Learning**: CNN architectures learn hierarchical patterns from spectrograms, with transfer learning from ImageNet for improved performance
-4. **Classification**: Binary classification outputs probability scores for normal vs abnormal heart sounds
-
-### Use Cases
-
-- **Medical Screening**: Assist healthcare providers in preliminary cardiac screening
-- **Telemedicine**: Enable remote heart sound analysis for patients in underserved areas
-- **Education**: Train medical students on heart sound identification
-- **Research**: Provide a baseline for developing more advanced cardiac diagnostic tools
-
-Built as a proof-of-concept for understanding digital auscultation and AI-powered diagnostic tools.
+1. **Preprocessing**: Resample to 2000 Hz, apply 5th-order Butterworth bandpass filter (25-400 Hz)
+2. **Feature Extraction**: 128-bin mel spectrograms capturing time-frequency representations
+3. **Deep Learning**: CNN architectures with transfer learning from ImageNet
+4. **Classification**: Binary classification with probability scores
 
 ## What This Does
 
@@ -50,43 +39,42 @@ Audio Recording (.wav) → Preprocessing → Mel Spectrogram → CNN → Normal/
 
 ## Quick Start
 
-### 1. Install Dependencies
+### Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/leosakharoff/heart_sound_classifier.git
+cd heart_sound_classifier
+
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-### 2. Download PhysioNet 2016 Data
+### Data Setup
 
 ```bash
 # Create data directory
 mkdir -p data/physionet_2016
-
-# Download training sets (you need at least one)
 cd data/physionet_2016
 
-# Training Set A (~25 MB)
+# Download PhysioNet 2016 training data
 wget https://physionet.org/files/challenge-2016/1.0.0/training-a.zip
 unzip training-a.zip
-
-# Optional: Download more sets for better results
-# wget https://physionet.org/files/challenge-2016/1.0.0/training-b.zip
-# wget https://physionet.org/files/challenge-2016/1.0.0/training-c.zip
 ```
 
-### 3. Train the Model
+### Training
 
 ```bash
 cd src
 
-# Quick training (limited data, ~5 min on CPU)
+# Quick training (limited data for testing)
 python train.py --data_dir ../data/physionet_2016 --epochs 10 --max_files 200
 
-# Full training (~15-30 min on CPU)
+# Full training
 python train.py --data_dir ../data/physionet_2016 --epochs 20
 ```
 
-### 4. Make Predictions
+### Inference
 
 ```bash
 # Classify a single file
@@ -96,19 +84,15 @@ python predict.py --audio_path /path/to/heart_sound.wav --visualize
 python predict.py --audio_dir /path/to/sounds/ --visualize
 ```
 
-## Expected Results
+## Results
 
-| Model | Accuracy | Training Time (CPU) |
-|-------|----------|---------------------|
-| Custom CNN | 75-80% | 5-10 min |
-| ResNet18 | 80-85% | 10-20 min |
-| CNN + Attention | 78-83% | 8-15 min |
+| Model | Parameters | Validation Accuracy | ROC-AUC |
+|-------|-----------|---------------------|---------|
+| Custom CNN (Light) | 23K | 74.58% | 0.737 |
+| Custom CNN (Medium) | 200K | ~75% | ~0.75 |
+| ResNet18 | 11M | ~80% | ~0.80 |
 
-State-of-the-art on this dataset is ~90%, achieved with:
-- Larger datasets
-- More sophisticated preprocessing
-- Ensemble methods
-- Transformer architectures
+**Note**: Results are based on the PhysioNet 2016 training-a subset (405 recordings, 4,738 samples). State-of-the-art on the full dataset (~3,000 recordings) achieves ~85-90% accuracy with ensemble methods and more sophisticated architectures.
 
 ## Technical Details
 
@@ -127,41 +111,47 @@ State-of-the-art on this dataset is ~90%, achieved with:
 
 ### Model Architectures
 
-**Custom CNN** (lightweight, fast):
-- 4 conv blocks with BatchNorm and MaxPool
+**Custom CNN (Lightweight)**:
+- 4 convolutional blocks with BatchNorm and MaxPool
 - Global average pooling
 - 3-layer MLP classifier with dropout
-- ~500K parameters
+- ~23K parameters
+- Fast training, suitable for edge deployment
 
-**ResNet18** (transfer learning):
+**ResNet18 (Transfer Learning)**:
 - Pretrained on ImageNet
-- Modified first conv for single-channel input
+- Modified first convolution for single-channel input
 - New classification head
 - ~11M parameters
+- Higher accuracy, longer training time
 
 ### Data Augmentation
 
-During training:
 - Time shifting (roll signal)
 - Frequency masking (mask random mel bins)
 - Time masking (mask random time frames)
 - Amplitude scaling
+
+### Class Imbalance Handling
+
+The dataset has a 71% Abnormal / 29% Normal distribution. The system uses:
+- Class-weighted cross-entropy loss
+- Balanced sampling in data loader
+- ROC-AUC as primary evaluation metric
 
 ## Project Structure
 
 ```
 heart_sound_classifier/
 ├── data/
-│   └── physionet_2016/      # PhysioNet dataset
+│   └── physionet_2016/      # PhysioNet dataset (not tracked)
 ├── src/
 │   ├── preprocess.py        # Audio preprocessing
 │   ├── dataset.py           # PyTorch dataset
 │   ├── model.py             # CNN architectures
 │   ├── train.py             # Training script
 │   └── predict.py           # Inference script
-├── models/
-│   └── best_model.pth       # Trained weights
-├── predictions/             # Visualizations
+├── models/                  # Trained models (not tracked)
 ├── requirements.txt
 └── README.md
 ```
@@ -176,24 +166,26 @@ The [PhysioNet/CinC 2016 Challenge](https://physionet.org/content/challenge-2016
 - **Sample rate**: 2000 Hz
 - **Sources**: Multiple stethoscope types and recording conditions
 
-Abnormalities include murmurs from various conditions.
+This project uses the training-a subset (405 recordings) as a proof-of-concept.
 
-## Relevance to AUSCORA
+## Limitations & Future Work
 
-This prototype demonstrates understanding of:
+### Current Limitations
 
-1. **The technical problem**: Classifying heart sounds is challenging due to noise, variability, and subtle differences between normal/abnormal
-2. **Signal processing**: Bandpass filtering, spectrogram extraction, segmentation
-3. **Deep learning for audio**: CNNs on spectrograms, transfer learning
-4. **Clinical context**: The goal is to assist clinicians, not replace them
+- **Single dataset subset**: Uses only training-a (405 files) out of 3,000+ available
+- **Single train/val split**: No cross-validation for robust evaluation
+- **Binary classification**: Normal vs Abnormal only (no murmur type differentiation)
+- **Proof-of-concept**: Not clinically validated or production-ready
 
-### What production systems add:
-- Real-time inference
-- Multi-device compatibility (device-agnostic models)
-- S1/S2 segmentation and murmur localization
-- Integration with clinical workflows
-- EU MDR regulatory compliance
-- Extensive clinical validation
+### Future Improvements
+
+- Use full PhysioNet dataset for better generalization
+- Implement k-fold cross-validation
+- Explore attention-based models for interpretability
+- Add cardiac cycle segmentation (S1/S2 detection)
+- Multi-class classification for different murmur types
+- Real-time inference optimization
+- External validation on independent datasets
 
 ## References
 
@@ -202,7 +194,11 @@ This prototype demonstrates understanding of:
 - [librosa: Audio Analysis in Python](https://librosa.org/)
 - [PyTorch Documentation](https://pytorch.org/docs/)
 
+## License
+
+This project is provided as-is for research and educational purposes.
+
 ---
 
-Built by Leo Sakharoff as part of interview preparation for AUSCORA.
-January 2026
+**Author**: Leo Sakharoff
+**Date**: January 2026
