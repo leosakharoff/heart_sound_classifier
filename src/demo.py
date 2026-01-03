@@ -7,8 +7,8 @@ Uses synthetic heart sounds for demonstration purposes.
 
 This is useful for:
 - Testing the pipeline quickly
-- Demonstrating the concept in the interview
-- Verifying all code works correctly
+- Demonstrating the concept
+- Verifying  code works correctly
 
 Usage:
     python demo.py
@@ -332,6 +332,7 @@ def demo():
     print("DEMO COMPLETE!")
     print("=" * 60)
     print("""
+    
 Key Takeaways:
 1. Heart sounds can be represented as mel spectrograms
 2. CNN models can learn to distinguish normal from abnormal

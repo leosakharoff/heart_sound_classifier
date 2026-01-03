@@ -64,7 +64,7 @@ class HeartSoundClassifier:
     def __init__(
         self,
         model_path: str,
-        model_type: str = 'cnn',
+        model_type: str = 'cnn_light',
         device: str = 'auto',
     ):
         """
@@ -279,7 +279,7 @@ def main():
     parser = argparse.ArgumentParser(description='Heart Sound Classifier - Prediction')
     parser.add_argument('--model_path', type=str, default='./models/best_model.pth',
                         help='Path to trained model')
-    parser.add_argument('--model_type', type=str, default='cnn',
+    parser.add_argument('--model_type', type=str, default='cnn_light',
                         choices=['cnn', 'cnn_light', 'resnet', 'attention'],
                         help='Model architecture')
     parser.add_argument('--audio_path', type=str, default=None,
